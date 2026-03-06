@@ -1,116 +1,73 @@
-let balance = parseInt(localStorage.getItem('balance')) || 100;
-let holds = [false, false, false];
+let balance = 100, debt = 0, seconds = 0, holds = [false, false, false];
 const symbols = ['🍎', '🍋', '🍒', '🔔', '💎', '7️⃣'];
-const moneyEmojis = ['💸', '💰', '💵', '🤑', '🪙'];
-const targetGoal = 1000;
-const betAmount = 10;
-const holdFee = 10;
-let isSpinning = false;
-
-// SOUNDS
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-function playSound(f, t, d, v = 0.1) {
-    const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
-    o.type = t; o.frequency.setValueAtTime(f, audioCtx.currentTime);
-    g.gain.setValueAtTime(v, audioCtx.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + d);
-    o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime + d);
-}
+let timerInterval = setInterval(() => { seconds++; }, 1000);
 
-function updateUI() {
-    document.getElementById('balance').innerText = balance;
-    const percent = Math.min((balance / targetGoal) * 100, 100);
-    document.getElementById('progress-bar').style.width = percent + "%";
-    
-    if (balance >= targetGoal) {
-        victory();
-    } else if (balance < 10 && !isSpinning) {
-        document.getElementById('result').innerText = "GAME OVER! Reset to try again.";
-    }
-    localStorage.setItem('balance', balance);
-}
-
-function victory() {
-    document.getElementById('result').innerText = "🏆 GRAND CHAMPION! 🏆";
-    document.getElementById('game-ui').style.borderColor = "gold";
-    document.getElementById('game-ui').style.boxShadow = "0 0 100px gold";
-    confetti({ particleCount: 400, spread: 100, origin: { y: 0.6 } });
-    setInterval(() => {
-        confetti({ particleCount: 20, angle: Math.random() * 360, colors: ['#ffd700', '#ffffff'] });
-    }, 300);
+function playSound(type, freq, duration) {
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.start(); osc.stop(audioCtx.currentTime + duration);
 }
 
 function toggleHold(i) {
-    if (isSpinning || balance < holdFee && !holds[i]) return;
-    holds[i] = !holds[i];
-    balance += holds[i] ? -holdFee : holdFee;
-    document.getElementById(`hold${i}`).classList.toggle('hold-active');
-    playSound(400, 'sine', 0.1);
-    updateUI();
+    if (balance < 10) return alert("Need $10 to hold!");
+    balance -= 10; holds[i] = !holds[i];
+    document.getElementById(`r${i + 1}`).classList.toggle('held');
+    playSound('square', 150, 0.1); updateUI();
 }
 
-function spinSlots() {
-    if (isSpinning || balance < betAmount || balance >= targetGoal) return;
-    if (audioCtx.state === 'suspended') audioCtx.resume();
-
-    balance -= betAmount;
-    updateUI();
-    isSpinning = true;
-
-    const reels = [document.getElementById('reel1'), document.getElementById('reel2'), document.getElementById('reel3')];
-    reels.forEach(r => r.classList.add('spinning'));
-
-    let spinInterval = setInterval(() => {
-        playSound(120, 'square', 0.05, 0.02);
-        reels.forEach((r, i) => {
-            if (!holds[i]) r.innerText = symbols[Math.floor(Math.random() * symbols.length)];
-        });
-    }, 80);
+function spin() {
+    if (balance < 10) return alert("Insufficient funds!");
+    balance -= 10; playSound('sawtooth', 300, 0.5);
+    const slots = document.querySelectorAll('.slot');
+    slots.forEach((s, i) => { if (!holds[i]) s.classList.add('spinning'); });
 
     setTimeout(() => {
-        clearInterval(spinInterval);
-        isSpinning = false;
-        reels.forEach(r => r.classList.remove('spinning'));
-
-        // HARD MODE: 15% Win Rate
-        const allowWin = Math.random() < 0.15;
-
-        if (allowWin) {
-            const winSym = holds.some(h => h) ? reels[holds.indexOf(true)].innerText : symbols[Math.floor(Math.random() * symbols.length)];
-            reels.forEach(r => r.innerText = winSym);
-            balance += 50; 
-            document.getElementById('result').innerText = "BIG WIN! +$50";
-            playSound(600, 'triangle', 0.5);
-            confetti({ particleCount: 100, spread: 70 });
-        } else {
-            reels[0].innerText = symbols[Math.floor(Math.random() * symbols.length)];
-            reels[1].innerText = symbols[Math.floor(Math.random() * symbols.length)];
-            let s3 = symbols[Math.floor(Math.random() * symbols.length)];
-            while (s3 === reels[0].innerText && reels[0].innerText === reels[1].innerText) {
-                s3 = symbols[Math.floor(Math.random() * symbols.length)];
-            }
-            reels[2].innerText = s3;
-            document.getElementById('result').innerText = "Bad luck... try again.";
-        }
-
+        slots.forEach((s, i) => {
+            s.classList.remove('spinning');
+            if (!holds[i]) s.innerText = symbols[Math.floor(Math.random() * symbols.length)];
+        });
+        playSound('sine', 500, 0.2);
+        if (balance >= 1000) win();
         holds = [false, false, false];
-        document.querySelectorAll('.hold-btn').forEach(btn => btn.classList.remove('hold-active'));
+        document.querySelectorAll('.slot').forEach(s => s.classList.remove('held'));
         updateUI();
-    }, 1800);
+    }, 1000);
 }
 
-// Background Rain
+function win() {
+    clearInterval(timerInterval);
+    confetti({particleCount: 500});
+    let scores = JSON.parse(localStorage.getItem('casinoScores') || "[]");
+    scores.push(seconds); scores.sort((a, b) => a - b);
+    localStorage.setItem('casinoScores', JSON.stringify(scores.slice(0, 5)));
+    displayScores();
+}
+
+function displayScores() {
+    const scores = JSON.parse(localStorage.getItem('casinoScores') || "[]");
+    document.getElementById('score-list').innerHTML = scores.map(s => `<li>${s} seconds</li>`).join('');
+}
+
+setInterval(() => { if(debt > 0) { balance = Math.max(0, balance - Math.ceil(debt*0.05)); updateUI(); } }, 10000);
 setInterval(() => {
-    const item = document.createElement('div');
-    item.className = 'money-item';
-    item.innerText = moneyEmojis[Math.floor(Math.random() * moneyEmojis.length)];
-    item.style.left = Math.random() * 100 + "vw";
-    item.style.fontSize = Math.random() * 20 + 20 + "px";
-    const dur = Math.random() * 2 + 3;
-    item.style.animationDuration = dur + "s";
-    document.getElementById('money-rain').appendChild(item);
-    setTimeout(() => item.remove(), dur * 1000);
+    const m = document.createElement('div');
+    m.className = 'money-item'; m.innerText = ['💸', '💰', '💵', '💎'][Math.floor(Math.random()*4)];
+    m.style.left = Math.random() * 100 + 'vw';
+    m.style.animationDuration = (Math.random() * 2 + 1) + 's';
+    document.getElementById('money-rain').appendChild(m);
+    setTimeout(() => m.remove(), 3000);
 }, 100);
 
-function resetGame() { localStorage.clear(); location.reload(); }
-updateUI();
+function takeLoan() { balance += 50; debt += 50; playSound('sine', 100, 0.3); updateUI(); }
+function updateUI() {
+    document.getElementById('balance').innerText = balance;
+    document.getElementById('debt-box').innerText = debt > 0 ? `DEBT: $${debt}` : "";
+    document.getElementById('progress-bar').style.width = Math.min((balance/1000)*100, 100) + '%';
+}
+displayScores(); updateUI();
