@@ -1,0 +1,32 @@
+body { background: radial-gradient(circle, #2a0000, #000); color: white; font-family: 'Arial Black', sans-serif; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; position: relative; }
+
+/* Goal Tracker */
+.goal-container { width: 350px; margin-bottom: 25px; text-align: center; z-index: 10; }
+.goal-text { font-size: 16px; color: gold; margin-bottom: 8px; letter-spacing: 3px; text-shadow: 0 0 10px gold; }
+.progress-bg { width: 100%; height: 20px; background: #111; border-radius: 10px; border: 2px solid #d4af37; overflow: hidden; }
+.progress-fill { width: 10%; height: 100%; background: linear-gradient(90deg, #ff0000, #ffd700, #00ff00); transition: width 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+
+/* Background Text */
+.mega-background { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 100%; text-align: center; z-index: -1; }
+.million-text { font-size: 18vw; margin: 0; color: rgba(255, 215, 0, 0.08); text-shadow: 0 0 40px rgba(212, 175, 55, 0.4); animation: bg-pulse 4s infinite; }
+@keyframes bg-pulse { 0%, 100% { transform: scale(1); opacity: 0.08; } 50% { transform: scale(1.05); opacity: 0.15; } }
+
+/* Machine Styling */
+.machine-wrapper { text-align: center; background: rgba(10, 10, 10, 0.98); padding: 40px; border-radius: 30px; border: 6px solid #ff4444; box-shadow: 0 0 60px rgba(255, 0, 0, 0.4); z-index: 10; }
+.glow-text { text-shadow: 0 0 15px #ff4444; color: #ff4444; margin-top: 0; }
+
+.reels { display: flex; gap: 15px; justify-content: center; margin-bottom: 25px; }
+.reel-window { width: 95px; height: 95px; background: white; border: 4px solid #d4af37; border-radius: 15px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.reel-inner { font-size: 55px; }
+.spinning { animation: spin-blur 0.1s linear infinite; filter: blur(4px); }
+@keyframes spin-blur { 0% { transform: translateY(-50px); } 100% { transform: translateY(50px); } }
+
+.hold-btn { padding: 12px; cursor: pointer; border-radius: 8px; border: none; background: #333; color: white; font-weight: bold; transition: 0.2s; }
+.hold-active { background: #ff4444 !important; box-shadow: 0 0 15px red; border: 2px solid white; }
+#spin-btn { padding: 18px 50px; font-size: 22px; cursor: pointer; background: linear-gradient(to bottom, #ffd700, #b8860b); border: none; border-radius: 12px; font-weight: bold; color: black; }
+#reset-btn { padding: 18px 25px; cursor: pointer; background: #444; color: white; border-radius: 12px; border: none; margin-left: 10px; }
+
+/* Money Rain */
+.money-rain-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; pointer-events: none; }
+.money-item { position: absolute; animation: fall linear infinite; }
+@keyframes fall { 0% { transform: translateY(-10vh) rotate(0deg); opacity: 0; } 10% { opacity: 0.8; } 100% { transform: translateY(110vh) rotate(360deg); opacity: 0; } }

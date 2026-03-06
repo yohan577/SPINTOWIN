@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SPIN TO $1,000</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+</head>
+<body>
+    <div id="money-rain" class="money-rain-container"></div>
+    <div class="mega-background"><h1 class="million-text">$1,000,000</h1></div>
+
+    <div class="goal-container">
+        <div class="goal-text">TARGET: $1,000</div>
+        <div class="progress-bg"><div id="progress-bar" class="progress-fill"></div></div>
+    </div>
+
+    <div class="machine-wrapper" id="game-ui">
+        <h1 class="glow-text">SPIN TO 1,000</h1>
+        <h3>Balance: $<span id="balance">100</span></h3>
+        
+        <div class="reels">
+            <div class="reel-window"><div id="reel1" class="reel-inner">🍎</div></div>
+            <div class="reel-window"><div id="reel2" class="reel-inner">🍋</div></div>
+            <div class="reel-window"><div id="reel3" class="reel-inner">🍒</div></div>
+        </div>
+
+        <div class="controls">
+            <button class="hold-btn" id="hold0" onclick="toggleHold(0)">Hold $10</button>
+            <button class="hold-btn" id="hold1" onclick="toggleHold(1)">Hold $10</button>
+            <button class="hold-btn" id="hold2" onclick="toggleHold(2)">Hold $10</button>
+        </div>
+
+        <div class="actions">
+            <button id="spin-btn" onclick="spinSlots()">Spin! ($10)</button>
+            <button id="reset-btn" onclick="resetGame()">Reset</button>
+        </div>
+        <h2 id="result"> Good Luck!</h2>
+        <h1>CREATED BY: JOHN LORENZO AUSTRIA</h1>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
