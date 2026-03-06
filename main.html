@@ -2,43 +2,50 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>SPIN TO WIN</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 </head>
 <body>
-    <div class="mega-background"><h1>$1,000,000</h1></div>
     <div id="money-rain" class="money-rain-container"></div>
-
-    <main class="casino-wrapper">
-        <h2 class="target-title">TARGET: $1,000</h2>
-        <div class="progress-bg"><div id="progress-bar" class="progress-fill"></div></div>
-
+   
+    <div class="game-wrapper">
         <div class="cabinet">
-            <h1>SPIN TO WIN </h1>
-            <div class="balance-box">BALANCE: $<span id="balance">100</span></div>
-            <div id="debt-box" class="debt-box"></div>
-
-            <div class="reels">
-                <div class="slot" id="r1" onclick="toggleHold(0)">🍎</div>
-                <div class="slot" id="r2" onclick="toggleHold(1)">🍋</div>
-                <div class="slot" id="r3" onclick="toggleHold(2)">🍒</div>
+             <h1>SPIN TO WIN</h1>
+            <div class="reels-grid" id="reels-grid">
+                <div class="slot" id="s0" onclick="toggleHold(0)">🍎</div><div class="slot" id="s1" onclick="toggleHold(1)">🍋</div><div class="slot" id="s2" onclick="toggleHold(2)">🍒</div>
+                <div class="slot" id="s3" onclick="toggleHold(3)">🔔</div><div class="slot" id="s4" onclick="toggleHold(4)">💎</div><div class="slot" id="s5" onclick="toggleHold(5)">7️⃣</div>
+                <div class="slot" id="s6" onclick="toggleHold(6)">🍎</div><div class="slot" id="s7" onclick="toggleHold(7)">🍋</div><div class="slot" id="s8" onclick="toggleHold(8)">🍒</div>
             </div>
-            
-            <P>CLICK ITEM TO HOLD -10 TO THE BALANCE</P>
-
-            <button class="casino-btn main-btn" onclick="spin()">SPIN ($10)</button>
-            <button class="casino-btn loan-btn" onclick="takeLoan()">BORROW $50</button>
-            <button class="casino-btn reset-btn" onclick="location.reload()">RESET</button>
-            
-            <div class="high-scores">
-                <h3>TOP 5 FASTEST</h3>
-                <ol id="score-list"></ol>
+            <div class="controls-container">
+                <button class="btn bet" onclick="setBet(10)">$10</button><button class="btn bet" onclick="setBet(50)">$50</button><button class="btn bet" onclick="setBet(100)">$100</button><button class="btn side-bet" onclick="placeSideBet()">SIDE</button>
+                <button class="btn spin" onclick="spin()">SPIN</button><button class="btn loan" onclick="takeLoan()">LOAN</button><button class="btn reset" onclick="location.reload()">RESET</button><button class="btn" onclick="alert('Hold a reel for $10 to keep it!')">?</button>
             </div>
-            <p class="creator">BY: JOHN LORENZO AUSTRIA</p>
         </div>
-    </main>
+
+        <div class="side-panel">
+            <div id="bal-text">BAL: $100</div>
+            <div id="debt-text">DEBT: $0</div>
+            <div id="bet-text">BET: $10</div>
+            <div id="side-text">SIDE: OFF</div>
+            <p><b>SIDE BET ($200) If 7️⃣ Appears on Center Reel you win +$300!</b></p>
+            <h2>GOAL $10,000</h2>
+            <div class="progress-bg"><div id="progress-bar" class="progress-fill"></div></div>
+            <hr style="width:100%; border: 0.5px solid #444; margin: 10px 0;">
+            <div class="payout-guide">
+                🍎🍋🍒🔔 : $150<br>
+                💎 : $500<br>
+                7️⃣ : $300<br>
+                SIDE BET : +$300
+            </div>
+        </div>
+    </div>
+    
+    <div id="win-modal" class="modal">
+        <h2 id="win-text">YOU WON!</h2>
+        <button onclick="document.getElementById('win-modal').style.display='none'">CONTINUE</button>
+    </div>
     <script src="script.js"></script>
 </body>
 </html>
